@@ -57,12 +57,21 @@ error_code_t ZHNetwork::begin(const char *netName, const bool gateway)
 #endif
     esp_now_register_send_cb(onDataSent);
     esp_now_register_recv_cb(onDataReceive);
+
+    ready = true;
+    return SUCCESS;
+}
+
+error_code_t ZHNetwork::stop()
+{
+    esp_now_deinit();
+    ready = false;
     return SUCCESS;
 }
 
 uint16_t ZHNetwork::sendBroadcastMessage(const char *data)
 {
-    return broadcastMessage(data, broadcastMAC, BROADCAST);
+    return broadcastMessage(data, broadcastMAC, ZH_BROADCAST);
 }
 
 uint16_t ZHNetwork::sendUnicastMessage(const char *data, const uint8_t *target, const bool confirm)
@@ -86,7 +95,7 @@ void ZHNetwork::maintenance()
 #if defined(ESP32)
             esp_now_del_peer(outgoingData.intermediateTargetMAC);
 #endif
-            if (onConfirmReceivingCallback && macToString(outgoingData.transmittedData.originalSenderMAC) == macToString(localMAC) && outgoingData.transmittedData.messageType == BROADCAST)
+            if (onConfirmReceivingCallback && macToString(outgoingData.transmittedData.originalSenderMAC) == macToString(localMAC) && outgoingData.transmittedData.messageType == ZH_BROADCAST)
                 onConfirmReceivingCallback(outgoingData.transmittedData.originalTargetMAC, outgoingData.transmittedData.messageID, true);
             if (macToString(outgoingData.transmittedData.originalSenderMAC) == macToString(localMAC) && outgoingData.transmittedData.messageType == UNICAST_WITH_CONFIRM)
             {
@@ -141,7 +150,7 @@ void ZHNetwork::maintenance()
         esp_now_peer_info_t peerInfo;
         memset(&peerInfo, 0, sizeof(peerInfo));
         memcpy(peerInfo.peer_addr, outgoingData.intermediateTargetMAC, 6);
-        peerInfo.channel = 1;
+        peerInfo.channel = WiFi.channel();
         peerInfo.encrypt = false;
         esp_now_add_peer(&peerInfo);
 #endif
@@ -151,8 +160,8 @@ void ZHNetwork::maintenance()
 #ifdef PRINT_LOG
         switch (outgoingData.transmittedData.messageType)
         {
-        case BROADCAST:
-            Serial.print(F("BROADCAST"));
+        case ZH_BROADCAST:
+            Serial.print(F("ZH_BROADCAST"));
             break;
         case UNICAST:
             Serial.print(F("UNICAST"));
@@ -191,9 +200,9 @@ void ZHNetwork::maintenance()
         bool routingUpdate{false};
         switch (incomingData.transmittedData.messageType)
         {
-        case BROADCAST:
+        case ZH_BROADCAST:
 #ifdef PRINT_LOG
-            Serial.print(F("BROADCAST message from MAC "));
+            Serial.print(F("ZH_BROADCAST message from MAC "));
             Serial.print(macToString(incomingData.transmittedData.originalSenderMAC));
             Serial.println(F(" received."));
 #endif
@@ -579,7 +588,7 @@ uint16_t ZHNetwork::broadcastMessage(const char *data, const uint8_t *target, me
     memcpy(&outgoingData.transmittedData.originalTargetMAC, target, 6);
     memcpy(&outgoingData.transmittedData.originalSenderMAC, &localMAC, 6);
     strcpy(outgoingData.transmittedData.message, data);
-    if (key_[0] && outgoingData.transmittedData.messageType == BROADCAST)
+    if (key_[0] && outgoingData.transmittedData.messageType == ZH_BROADCAST)
         for (uint8_t i{0}; i < strlen(outgoingData.transmittedData.message); ++i)
             outgoingData.transmittedData.message[i] = outgoingData.transmittedData.message[i] ^ key_[i % strlen(key_)];
     memcpy(&outgoingData.intermediateTargetMAC, &broadcastMAC, 6);
@@ -587,8 +596,8 @@ uint16_t ZHNetwork::broadcastMessage(const char *data, const uint8_t *target, me
 #ifdef PRINT_LOG
     switch (outgoingData.transmittedData.messageType)
     {
-    case BROADCAST:
-        Serial.print(F("BROADCAST"));
+    case ZH_BROADCAST:
+        Serial.print(F("ZH_BROADCAST"));
         break;
     case SEARCH_REQUEST:
         Serial.print(F("SEARCH_REQUEST"));

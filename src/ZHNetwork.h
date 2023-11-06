@@ -65,7 +65,7 @@ typedef struct
 
 typedef enum
 {
-    BROADCAST = 1,
+    ZH_BROADCAST = 1,
     UNICAST,
     UNICAST_WITH_CONFIRM,
     DELIVERY_CONFIRM_RESPONSE,
@@ -95,6 +95,7 @@ public:
     ZHNetwork &setOnConfirmReceivingCallback(on_confirm_t onConfirmReceivingCallback);
 
     error_code_t begin(const char *netName = "", const bool gateway = false);
+    error_code_t stop();
 
     uint16_t sendBroadcastMessage(const char *data);
     uint16_t sendUnicastMessage(const char *data, const uint8_t *target, const bool confirm = false);
@@ -115,6 +116,8 @@ public:
     uint8_t getMaxWaitingTimeBetweenTransmissions(void);
     error_code_t setMaxWaitingTimeForRoutingInfo(const uint16_t maxTimeForRoutingInfoWaiting);
     uint16_t getMaxWaitingTimeForRoutingInfo(void);
+
+    bool ready = false;
 
 private:
     static routing_vector_t routingVector;
