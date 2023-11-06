@@ -65,7 +65,7 @@ typedef struct
 
 typedef enum
 {
-    BROADCAST = 1,
+    ZH_BROADCAST = 1,
     UNICAST,
     UNICAST_WITH_CONFIRM,
     DELIVERY_CONFIRM_RESPONSE,
