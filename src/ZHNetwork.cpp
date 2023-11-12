@@ -46,7 +46,7 @@ error_code_t ZHNetwork::begin(const char *netName, const bool gateway)
 #ifdef PRINT_LOG
     Serial.begin(115200);
 #endif
-    WiFi.mode(gateway ? WIFI_AP_STA : WIFI_STA);
+    //WiFi.mode(gateway ? WIFI_AP_STA : WIFI_STA); 
     esp_now_init();
 #if defined(ESP8266)
     wifi_get_macaddr(gateway ? SOFTAP_IF : STATION_IF, localMAC);
