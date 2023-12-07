@@ -699,3 +699,16 @@ uint16_t ZHNetwork::unicastMessage(const char *data, const uint8_t *target, cons
 #endif
     return outgoingData.transmittedData.messageID;
 }
+
+
+void ZHNetwork::stats(){
+    ESP_LOGD("ZHNetwork", "rv=%d,qo=%d,qi=%d,qw=%d [%d]", routingVector.size(), queueForOutgoingData.size(), queueForIncomingData.size(), queueForRoutingVectorWaiting.size(), ESP.getFreeHeap());
+}
+
+void ZHNetwork::clearOutgoingQue()
+{
+    while (!queueForOutgoingData.empty())
+    {
+        queueForOutgoingData.pop();
+    }
+}

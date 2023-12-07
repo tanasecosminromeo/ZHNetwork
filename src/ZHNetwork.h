@@ -119,6 +119,10 @@ public:
 
     bool ready = false;
 
+    void stats();
+
+    void clearOutgoingQue();
+
 private:
     static routing_vector_t routingVector;
     static confirmation_vector_t confirmationVector;
