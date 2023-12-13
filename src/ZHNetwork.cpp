@@ -209,8 +209,17 @@ void ZHNetwork::maintenance()
             if (onBroadcastReceivingCallback)
             {
                 if (key_[0])
-                    for (uint8_t i{0}; i < strlen(incomingData.transmittedData.message); ++i)
-                        incomingData.transmittedData.message[i] = incomingData.transmittedData.message[i] ^ key_[i % strlen(key_)];
+                    for (uint8_t i{0}; i < strlen(incomingData.transmittedData.message); ++i){
+                        //incomingData.transmittedData.message[i] = incomingData.transmittedData.message[i] ^ key_[i % strlen(key_)];
+                        char messageChar = incomingData.transmittedData.message[i];
+                        char keyChar = key_[i % strlen(key_)];
+
+                        if (messageChar != keyChar) {
+                            incomingData.transmittedData.message[i] = messageChar ^ keyChar;
+                        } else {
+                            incomingData.transmittedData.message[i] = messageChar;
+                        }
+                    }
                 onBroadcastReceivingCallback(incomingData.transmittedData.message, incomingData.transmittedData.originalSenderMAC);
             }
             forward = true;
@@ -230,8 +239,16 @@ void ZHNetwork::maintenance()
                 if (onUnicastReceivingCallback)
                 {
                     if (key_[0])
-                        for (uint8_t i{0}; i < strlen(incomingData.transmittedData.message); ++i)
-                            incomingData.transmittedData.message[i] = incomingData.transmittedData.message[i] ^ key_[i % strlen(key_)];
+                        for (uint8_t i{0}; i < strlen(incomingData.transmittedData.message); ++i){
+                            char messageChar = incomingData.transmittedData.message[i];
+                            char keyChar = key_[i % strlen(key_)];
+
+                            if (messageChar != keyChar) {
+                                incomingData.transmittedData.message[i] = messageChar ^ keyChar;
+                            } else {
+                                incomingData.transmittedData.message[i] = messageChar;
+                            }
+                        }
                     onUnicastReceivingCallback(incomingData.transmittedData.message, incomingData.transmittedData.originalSenderMAC);
                 }
             }
@@ -253,8 +270,16 @@ void ZHNetwork::maintenance()
                 if (onUnicastReceivingCallback)
                 {
                     if (key_[0])
-                        for (uint8_t i{0}; i < strlen(incomingData.transmittedData.message); ++i)
-                            incomingData.transmittedData.message[i] = incomingData.transmittedData.message[i] ^ key_[i % strlen(key_)];
+                        for (uint8_t i{0}; i < strlen(incomingData.transmittedData.message); ++i){
+                            char messageChar = incomingData.transmittedData.message[i];
+                            char keyChar = key_[i % strlen(key_)];
+
+                            if (messageChar != keyChar) {
+                                incomingData.transmittedData.message[i] = messageChar ^ keyChar;
+                            } else {
+                                incomingData.transmittedData.message[i] = messageChar;
+                            }
+                        }
                     onUnicastReceivingCallback(incomingData.transmittedData.message, incomingData.transmittedData.originalSenderMAC);
                 }
                 confirmation_id_t id;
@@ -589,8 +614,16 @@ uint16_t ZHNetwork::broadcastMessage(const char *data, const uint8_t *target, me
     memcpy(&outgoingData.transmittedData.originalSenderMAC, &localMAC, 6);
     strcpy(outgoingData.transmittedData.message, data);
     if (key_[0] && outgoingData.transmittedData.messageType == ZH_BROADCAST)
-        for (uint8_t i{0}; i < strlen(outgoingData.transmittedData.message); ++i)
-            outgoingData.transmittedData.message[i] = outgoingData.transmittedData.message[i] ^ key_[i % strlen(key_)];
+        for (uint8_t i{0}; i < strlen(outgoingData.transmittedData.message); ++i){
+            char messageChar = outgoingData.transmittedData.message[i];
+            char keyChar = key_[i % strlen(key_)];
+
+            if (messageChar != keyChar) {
+                outgoingData.transmittedData.message[i] = messageChar ^ keyChar;
+            } else {
+                outgoingData.transmittedData.message[i] = messageChar;
+            }
+        }
     memcpy(&outgoingData.intermediateTargetMAC, &broadcastMAC, 6);
     queueForOutgoingData.push(outgoingData);
 #ifdef PRINT_LOG
@@ -627,8 +660,16 @@ uint16_t ZHNetwork::unicastMessage(const char *data, const uint8_t *target, cons
     memcpy(&outgoingData.transmittedData.originalSenderMAC, sender, 6);
     strcpy(outgoingData.transmittedData.message, data);
     if (key_[0] && macToString(outgoingData.transmittedData.originalSenderMAC) == macToString(localMAC) && outgoingData.transmittedData.messageType != DELIVERY_CONFIRM_RESPONSE)
-        for (uint8_t i{0}; i < strlen(outgoingData.transmittedData.message); ++i)
-            outgoingData.transmittedData.message[i] = outgoingData.transmittedData.message[i] ^ key_[i % strlen(key_)];
+        for (uint8_t i{0}; i < strlen(outgoingData.transmittedData.message); ++i) {
+            char messageChar = outgoingData.transmittedData.message[i];
+            char keyChar = key_[i % strlen(key_)];
+
+            if (messageChar != keyChar) {
+                outgoingData.transmittedData.message[i] = messageChar ^ keyChar;
+            } else {
+                outgoingData.transmittedData.message[i] = messageChar;
+            }
+        }
     for (uint16_t i{0}; i < routingVector.size(); ++i)
     {
         routing_table_t routingTable = routingVector[i];
