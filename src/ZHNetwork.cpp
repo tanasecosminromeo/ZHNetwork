@@ -711,4 +711,55 @@ void ZHNetwork::clearOutgoingQue()
     {
         queueForOutgoingData.pop();
     }
+    ESP_LOGD("ZHNetwork", "   >> clearOutgoingQue: all");
+}
+
+void ZHNetwork::clearOutgoingQue(String prefix)
+{
+    outgoing_queue_t tempQueue;
+
+    while (!queueForOutgoingData.empty())
+    {
+        outgoing_data_t data = queueForOutgoingData.front();
+        queueForOutgoingData.pop();
+
+        if (strncmp(data.transmittedData.message, prefix.c_str(), prefix.length()) != 0)
+        {
+            tempQueue.push(data);
+        } else {
+            ESP_LOGD("ZHNetwork", "   >> clearOutgoingQue: %s", data.transmittedData.message);
+        }
+    }
+
+    queueForOutgoingData.swap(tempQueue);
+}
+
+void ZHNetwork::clearOutgoingQue(std::vector<String> prefixes)
+{
+    outgoing_queue_t tempQueue;
+
+    while (!queueForOutgoingData.empty())
+    {
+        outgoing_data_t data = queueForOutgoingData.front();
+        queueForOutgoingData.pop();
+
+        bool found = false;
+        for (const String& prefix : prefixes)
+        {
+            if (strncmp(data.transmittedData.message, prefix.c_str(), prefix.length()) == 0)
+            {
+                found = true;
+                break;
+            }
+        }
+
+        if (!found)
+        {
+            tempQueue.push(data);
+        } else {
+            ESP_LOGD("ZHNetwork", "   >> clearOutgoingQue: %s", data.transmittedData.message);
+        }
+    }
+
+    queueForOutgoingData.swap(tempQueue);
 }

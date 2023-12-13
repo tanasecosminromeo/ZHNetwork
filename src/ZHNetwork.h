@@ -122,6 +122,8 @@ public:
     void stats();
 
     void clearOutgoingQue();
+    void clearOutgoingQue(String prefix);
+    void clearOutgoingQue(std::vector<String> prefixes);
 
 private:
     static routing_vector_t routingVector;
