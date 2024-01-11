@@ -743,7 +743,7 @@ uint16_t ZHNetwork::unicastMessage(const char *data, const uint8_t *target, cons
 
 
 void ZHNetwork::stats(){
-    ESP_LOGD("ZHNetwork", "rv=%d,qo=%d,qi=%d,qw=%d [%d]", routingVector.size(), queueForOutgoingData.size(), queueForIncomingData.size(), queueForRoutingVectorWaiting.size(), ESP.getFreeHeap());
+    ESP_LOGV("ZHNetwork", "rv=%d,qo=%d,qi=%d,qw=%d [%d]", routingVector.size(), queueForOutgoingData.size(), queueForIncomingData.size(), queueForRoutingVectorWaiting.size(), ESP.getFreeHeap());
 }
 
 void ZHNetwork::clearOutgoingQue()
@@ -752,7 +752,7 @@ void ZHNetwork::clearOutgoingQue()
     {
         queueForOutgoingData.pop();
     }
-    ESP_LOGD("ZHNetwork", "   >> clearOutgoingQue: all");
+    ESP_LOGV("ZHNetwork", "   >> clearOutgoingQue: all");
 }
 
 void ZHNetwork::clearOutgoingQue(String prefix)
