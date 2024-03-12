@@ -12,6 +12,7 @@
 #include "esp_wifi.h"
 #include "esp_now.h"
 #endif
+#include "esp_random.h"
 
 // #define PRINT_LOG // Uncomment to display to serial port the full operation log.
 
@@ -155,7 +156,7 @@ private:
 #endif
 #if defined(ESP32)
     static void onDataSent(const uint8_t *mac, esp_now_send_status_t status);
-    static void onDataReceive(const uint8_t *mac, const uint8_t *data, int length);
+    static void onDataReceive(const esp_now_recv_info *info, const uint8_t *data, int length);
 #endif
     uint16_t broadcastMessage(const char *data, const uint8_t *target, message_type_t type);
     uint16_t unicastMessage(const char *data, const uint8_t *target, const uint8_t *sender, message_type_t type);

@@ -552,7 +552,7 @@ void IRAM_ATTR ZHNetwork::onDataSent(uint8_t *mac, uint8_t status)
 void IRAM_ATTR ZHNetwork::onDataReceive(uint8_t *mac, uint8_t *data, uint8_t length)
 #endif
 #if defined(ESP32)
-    void IRAM_ATTR ZHNetwork::onDataReceive(const uint8_t *mac, const uint8_t *data, int length)
+    void IRAM_ATTR ZHNetwork::onDataReceive(const esp_now_recv_info *info, const uint8_t *data, int length)
 #endif
 {
     if (criticalProcessSemaphore)
@@ -587,7 +587,8 @@ void IRAM_ATTR ZHNetwork::onDataReceive(uint8_t *mac, uint8_t *data, uint8_t len
     for (uint8_t i{sizeof(lastMessageID) / 2 - 1}; i >= 1; --i)
         lastMessageID[i] = lastMessageID[i - 1];
     lastMessageID[0] = incomingData.transmittedData.messageID;
-    memcpy(&incomingData.intermediateSenderMAC, mac, 6);
+
+    memcpy(&incomingData.intermediateSenderMAC, info->src_addr, 6);
     queueForIncomingData.push(incomingData);
     criticalProcessSemaphore = false;
 }
