@@ -464,11 +464,6 @@ String ZHNetwork::getNodeMac()
     return macToString(localMAC);
 }
 
-String ZHNetwork::getFirmwareVersion()
-{
-    return firmware;
-}
-
 String ZHNetwork::macToString(const uint8_t *mac)
 {
     String string;

@@ -104,9 +104,6 @@ public:
     void maintenance(void);
 
     String getNodeMac(void);
-    String getFirmwareVersion(void);
-    String readErrorCode(error_code_t code); // Just for further development.
-
     static String macToString(const uint8_t *mac);
     uint8_t *stringToMac(const String &string, uint8_t *mac);
 
@@ -126,9 +123,25 @@ public:
     void clearOutgoingQue(String prefix);
     void clearOutgoingQue(std::vector<String> prefixes);
 
-private:
-    static routing_vector_t routingVector;
-    static confirmation_vector_t confirmationVector;
+    uint printMemoryUsage(){
+        uint total = 0;
+
+        ESP_LOGI("ZHNetwork", " > > Routing vector: %s bytes", String(estimateMemoryUsage(routingVector)).c_str());
+        ESP_LOGI("ZHNetwork", " > > Confirmation vector: %s bytes", String(estimateMemoryUsage(confirmationVector)).c_str());
+        ESP_LOGI("ZHNetwork", " > > Incoming queue: %s bytes", String(estimateMemoryUsage(queueForIncomingData)).c_str());
+        ESP_LOGI("ZHNetwork", " > > Outgoing queue: %s bytes", String(estimateMemoryUsage(queueForOutgoingData)).c_str());
+        ESP_LOGI("ZHNetwork", " > > Routing vector waiting queue: %s bytes", String(estimateMemoryUsage(queueForRoutingVectorWaiting)).c_str()); 
+
+        total = estimateMemoryUsage(routingVector) + estimateMemoryUsage(confirmationVector) + estimateMemoryUsage(queueForIncomingData) + estimateMemoryUsage(queueForOutgoingData) + estimateMemoryUsage(queueForRoutingVectorWaiting);
+
+        ESP_LOGI("ZHNetwork", " > > Total: %s bytes", String(total).c_str());
+        
+        return total;
+    }
+
+    private:
+        static routing_vector_t routingVector;
+        static confirmation_vector_t confirmationVector;
     static incoming_queue_t queueForIncomingData;
     static outgoing_queue_t queueForOutgoingData;
     static waiting_queue_t queueForRoutingVectorWaiting;
@@ -142,13 +155,22 @@ private:
     static char netName_[20];
     static char key_[20];
 
-    const char *firmware{"1.42"};
     const uint8_t broadcastMAC[6]{0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     uint8_t maxNumberOfAttempts_{3};
     uint8_t maxWaitingTimeBetweenTransmissions_{50};
     uint8_t numberOfAttemptsToSend{1};
     uint16_t maxTimeForRoutingInfoWaiting_{500};
     uint32_t lastMessageSentTime{0};
+
+    template<typename T>
+    size_t estimateMemoryUsage(const std::queue<T>& q) {
+        return sizeof(q) + (sizeof(T) * q.size());
+    }
+
+    template<typename T>
+    size_t estimateMemoryUsage(const std::vector<T>& v) {
+        return sizeof(v) + (sizeof(T) * v.size());
+    }
 
 #if defined(ESP8266)
     static void onDataSent(uint8_t *mac, uint8_t status);
